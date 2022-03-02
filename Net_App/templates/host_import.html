@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}导入主机{% endblock %}
+{% block content %}
+<h5 class="mt-4">导入主机</h5>
+{% if request.session.is_login %}
+<p>导入的EXCEL表必须包含以下字段: </p>
+<p> ip_address, hostname, username, password, enable_password, ssh_port, vendor, type</p>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file"  name="myfile">
+    <button type="submit" class="btn btn-outline-secondary btn-sm">导入</button>
+</form>
+</br>
+{% else %}
+    <h6 class="mt-4">你尚未登录，只能访问公开内容！</h6>
+{% endif %}
+{% endblock content %}

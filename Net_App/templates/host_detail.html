@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}主机详情{% endblock %}
+{% block content %}
+<h5 class="mt-4">主机详情</h5>
+{% if request.session.is_login %}
+<form method="POST">
+{% csrf_token %}
+
+{{ form.as_p }}
+
+</form>
+</br>
+{% else %}
+    <h6 class="mt-4">你尚未登录，只能访问公开内容！</h6>
+{% endif %}
+{% endblock content %}

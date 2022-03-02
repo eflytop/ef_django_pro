@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/jquery.dataTables.min.css">
+    <script src="/static/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" class="init">
+        $(document).ready(function() {
+	        $('#efdatatable').DataTable();
+        } );
+	</script>
+    <title>CNCS批量配置系统</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+        <a class="navbar-brand" href="#"><img src="/static/image/logo.png" width="120" height="33" alt=""></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'index' %}">主页 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'device_list' %}">设备</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'cfg_host' %}">配置</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'cfg_backup' %}">备份</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'cfg_log' %}">日志</a>
+            </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0 ">
+              {% if request.session.is_login %}
+                 <a class="text-light" href="#">当前在线：{{ request.session.user_name }}</a>&nbsp;&nbsp;
+                 <a class="text-light"  href="/logout/">登出</a>
+              {% else %}
+                <a class="text-light" href="/login/">登录</a>
+                <!-- <a class="nav-link" href="/register/">注册</a> -->
+              {% endif %}
+            </form>
+        </div>
+        </div>
+    </nav>
+    <div class="container mb-4">
+        {% block content %}
+
+        {% endblock %}
+    </div>
+</body>
+<footer class="card-footer mt-auto">
+    <p class="text-center">Copyright @ 2022 eflytop.com</p>
+</footer>
+</html>

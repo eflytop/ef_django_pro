@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}批量更新{% endblock %}
+{% block content %}
+<h5 class="mt-4">批量更新</h5>
+{% if request.session.is_login %}
+<p>批量更新以下主机信息：</p>
+<p>{{selected_ip_list}}</p>
+<form id="myForm" method="post">
+{% csrf_token %}
+<table>
+    <tr>
+        <td><label for="username">用户名称：</label></td>
+        <td><input id="username"  type="text" class="form-control" name="username"  placeholder="请输入新用户名"></td>
+        <td><input type="submit" name="updateUsername" class="ml-4 btn btn-outline-secondary btn-sm" value="更新"/></td>
+    </tr>
+    <tr>
+        <td><label for="password">登录密码：</label></td>
+        <td><input id="password"  type="text" class="form-control" name="password" placeholder="请输入新密码"></td>
+        <td><input type="submit" name="updatePassword" class="ml-4 btn btn-outline-secondary btn-sm" value="更新"/></td>
+    </tr>
+    <tr>
+        <td><label for="enable_password">enable密码：</label></td>
+        <td><input id="enable_password" class="form-control" type="password"  name="enable_password"></td>
+        <td><input type="submit" name="updateEnable_password" class="ml-4 btn btn-outline-secondary btn-sm" value="更新"/></td>
+    </tr>
+    <tr>
+        <td><label for="ssh_port">ssh端口：</label></td>
+        <td><input id="ssh_port" type="number"  class="form-control"  name="ssh_port" value="22"></td>
+        <td><input type="submit" name="updateSsh_port" class="ml-4 btn btn-outline-secondary btn-sm" value="更新"/></td>
+    </tr>
+    <tr>
+        <td><label  class="form-check-label" for="vendor">厂商：</label></td>
+        <td>
+            <select name="vendor" id="vendor" class="form-control">
+                <option value="Cisco">思科</option>
+                <option value="Fortinet">飞塔</option>
+            </select>
+        </td>
+        <td><input type="submit" name="updateVendor" class="ml-4 btn btn-outline-secondary btn-sm" value="更新"/></td>
+    </tr>
+    <tr>
+        <td><label for="type">类型：</label></td>
+        <td>
+            <select name="type" id="type" class="form-control">
+                <option value="Router">路由器</option>
+                <option value="Switch">交换机</option>
+                <option value="Firewall">防火墙</option>
+            </select>
+        </td>
+        <td><input type="submit" name="updateType" class="ml-4 btn btn-outline-secondary btn-sm" value="更新"/></td>
+    </tr>
+</table>
+    <button class="mt-3 btn btn-outline-secondary btn-sm" type="submit " >更新全部</button>
+    <button class="mt-3 btn btn-outline-secondary btn-sm" type="reset" >重置</button>
+    <a href="/device_list/" class="mt-3 btn btn-outline-secondary btn-sm">取消</a>
+</form>
+
+</br>
+{% else %}
+    <h6 class="mt-4">你尚未登录，只能访问公开内容！</h6>
+{% endif %}
+{% endblock content %}

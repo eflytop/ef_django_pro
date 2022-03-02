@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}添加主机{% endblock %}
+{% block content %}
+<h5 class="mt-4">添加主机</h5>
+{% if request.session.is_login %}
+<form action="" method="post">
+{% csrf_token %}
+<div class="form-row align-items-center mt-4">
+    <div class="col-auto">
+        <label for="ip_address">IP地址：</label>
+        <input id="ip_address" class="form-control" type="text" name="ip_address" >
+    </div>
+    <div class="col-auto">
+        <label for="hostname">主机名：</label>
+        <input id="hostname" class="form-control" type="text" name="hostname"  >
+    </div>
+</div>
+<div class="form-row align-items-center mt-4">
+    <div class="col-auto">
+        <label for="username">用户名称：</label>
+        <input id="username" class="form-control" type="text" name="username" placeholder="请输入登录设备的用户名">
+    </div>
+    <div class="col-auto">
+        <label for="password">登录密码：</label>
+        <input id="password" class="form-control" type="password"  name="password" placeholder="请输入登录设备的密码">
+    </div>
+ </div>
+  <div class="form-row align-items-center mt-4">
+    <div class="col-auto">
+        <label for="enable_password">enable密码：</label>
+        <input id="enable_password" class="form-control" type="password"  name="enable_password">
+        <small class="form-text text-muted">如无enable密码，此项不填</small>
+    </div>
+        <div class="col-auto">
+        <label for="ssh_port">ssh端口：</label>
+        <input id="ssh_port" type="number"  class="form-control"  name="ssh_port" value="22">
+        <small class="form-text text-muted">默认端口22，可不填</small>
+    </div>
+ </div>
+ <div class="form-row align-items-center mt-4">
+    <div class="col-auto">
+        <label  class="form-check-label" for="vendor">厂商：</label>
+        <input  type="radio"  class="mr-2" name="vendor" value="Cisco" checked>思科  <input type="radio"  class="ml-4 mr-2" name="vendor" value="Fortinet">飞塔
+    </div>
+ </div>
+<div class="form-row align-items-center mt-4 mb-4">
+    <div class="col-auto">
+        <label for="type">类型：</label>
+        <input class="mr-2" type="radio"  name="type" value="Router" checked>路由器  <input type="radio"  class="ml-4 mr-2"  name="type" value="Switch">交换机 <input type="radio" class="ml-4 mr-2" name="type" value="Firewall">防火墙
+    </div>
+</div>
+    <button type="submit" class="btn btn-outline-secondary btn-sm">提交</button>
+    <button type="reset" class="btn btn-outline-secondary btn-sm">重置</button>
+    <a href="/device_list/" class="btn btn-outline-secondary btn-sm">取消</a>
+</form>
+</br>
+{% else %}
+    <h6 class="mt-4">你尚未登录，只能访问公开内容！</h6>
+{% endif %}
+{% endblock content %}
