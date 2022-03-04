@@ -39,10 +39,47 @@
         <a href="/host_add/" class="btn btn-outline-secondary btn-sm">新增</a>
         <input type="submit" class="btn btn-outline-secondary btn-sm" name="updateHost" value="更新"/>
         <input type="submit" class="btn btn-outline-secondary btn-sm" name="delHost"  onclick="comfirmDel()" value="删除"/>
-        <a href="/host_import/" class="btn btn-outline-secondary btn-sm">导入</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#importHost">导入</button>
         <input type="submit" class="btn btn-outline-secondary btn-sm" name="exportHost" onclick="comfirmExport()" value="导出"/>
 </form>
+<!-- Modal ImportHost Start-->
+<div class="modal fade" id="importHost" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">导入主机</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <form method="post" enctype="multipart/form-data">
+      <div class="modal-body">
+            <p>导入的EXCEL表必须包含以下字段: </p>
+            <p> ip_address, hostname, username, password, enable_password, ssh_port, vendor, type</p>
+            {% csrf_token %}
+            <input type="file"  name="imported_file">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">取消</button>
+        <button type="submit" class="btn btn-outline-secondary btn-sm" name="importHost">导入</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal ImportHost End-->
 </br>
+<script>
+$(function() {
+    $('#myModal').on('hide.bs.modal',
+    function() {
+        alert('嘿，我听说您喜欢模态框...');
+    })
+});
+</script>
+<script type="text/javascript">
+    $function importHost(){
+        $('#myModal').modal('hide')
+    };
+</script>
 <script type="text/javascript">
          function selects(){
             var ele=document.getElementsByName('seleted_device_id');

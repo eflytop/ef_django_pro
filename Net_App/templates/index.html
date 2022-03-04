@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}主页{% endblock %}
 {% block content %}
+<!-- Button trigger modal -->
 <div class="mt-5 card-deck" style="margin:auto;"><!--使用bootstrap的卡片,mt-5代表margin top，所谓margin是CSS中的外边距的意思，margin top就是离上面导航栏的距离，改成mt-0看看？-->
     <div class="card border-dark mb-3" style="max-width: 18rem;"><!--卡片边框颜色为primary，即蓝色，最大长度为18rem（rem在CSS中是一种字体大小单位，了解即可)-->
         <div class="card-body text-primary"><!--卡片文字颜色为primary，即蓝色。-->
@@ -23,7 +24,6 @@
         <div class="card-footer bg-info border-info text-white">飞塔设备</div>
     </div>
 </div>
-
 <div class="mt-0 card-deck" style="margin:auto;"><!--使用bootstrap的卡片,mt-5代表margin top，所谓margin是CSS中的外边距的意思，margin top就是离上面导航栏的距离，改成mt-0看看？-->
     <div class="card border-primary mb-3" style="max-width: 18rem;"><!--卡片边框颜色为primary，即蓝色，最大长度为18rem（rem在CSS中是一种字体大小单位，了解即可)-->
         <div class="card-body text-primary"><!--卡片文字颜色为primary，即蓝色。-->
@@ -71,14 +71,14 @@
         {% endfor %}
     </tbody>
 </table>
-     <script language="javascript" type="text/javascript">
-        window.onload = function () {
-            var tableLine = document.getElementById("number");
-            for (var i = 0; i < tableLine.rows.length; i++) {
-                tableLine.rows[i].cells[0].innerHTML = (i + 1);
-            }
+<script language="javascript" type="text/javascript">
+    window.onload = function () {
+        var tableLine = document.getElementById("number");
+        for (var i = 0; i < tableLine.rows.length; i++) {
+            tableLine.rows[i].cells[0].innerHTML = (i + 1);
         }
-    </script>
+    }
+</script>
 {% else %}
     <h6 class="mt-4">你尚未登录，只能访问公开内容！</h6>
 {% endif %}

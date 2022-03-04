@@ -5,7 +5,8 @@ from .forms import UserForm
 from django.contrib.auth import authenticate
 import paramiko
 import time
-from datetime import datetime
+from django.utils import timezone as datetime
+#from datetime import datetime
 import hashlib
 from tablib import Dataset
 from django.http import HttpResponse
@@ -98,6 +99,15 @@ def device_list(request):
             return response
         if 'updateHost' in request.POST:
             return redirect('host_update')
+        if 'importHost' in request.POST:
+            device_resource = DeviceResource()
+            dataset = Dataset()
+            new_devices = request.FILES['imported_file']
+            imported_data = dataset.load(new_devices.read())
+            result = device_resource.import_data(dataset, dry_run=True)  # Test the data import
+            if not result.has_errors():
+                device_resource.import_data(dataset, dry_run=False)  # Actually import now
+                return redirect('device_list')
     return redirect('device_list')
 
 def host_add(request):
@@ -184,18 +194,6 @@ def host_edit(request):
         return redirect('device_list')
     return render(request, 'host_edit.html', locals())
 
-def host_import(request):
-    if request.method == 'POST':
-        device_resource = DeviceResource()
-        dataset = Dataset()
-        new_devices = request.FILES['myfile']
-        imported_data = dataset.load(new_devices.read())
-        result = device_resource.import_data(dataset, dry_run=True)  # Test the data import
-        if not result.has_errors():
-            device_resource.import_data(dataset, dry_run=False)  # Actually import now
-            return redirect('device_list')
-    return render(request, 'host_import.html')
-
 def cfg_host(request):
     if request.method == 'GET':
         device_list = Device.objects.all()
@@ -278,9 +276,9 @@ def cfg_backup(request):
                         conn = ssh_client.invoke_shell()
                         conn.send('enable\n')
                         conn.send(f'{dev.enable_password}\n')
-                        conn.send('terminal length 0\n')
+                        conn.send('terminal pager 0\n')
                         conn.send('show run\n')
-                        time.sleep(2)
+                        time.sleep(10)
                         output = conn.recv(65535).decode('ascii')
                         now = datetime.now()
                         date = f'{now.month}_{now.day}_{now.year}'

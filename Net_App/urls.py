@@ -31,9 +31,8 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('host_add/', views.host_add, name='host_add'),
-#    path('host_del/', views.host_del, name='host_del'),
     path('host_edit/', views.host_edit, name='host_edit'),
     path('host_update/', views.host_update, name='host_update'),
-    path('host_import/', views.host_import, name='host_import'),
+    # path('host_import/', views.host_import, name='host_import'),
 #    path('post/<slug:pk>/', DeviceUpdateView.as_view(), name='Host_update'),
 ]
