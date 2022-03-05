@@ -28,8 +28,8 @@ def collect_intfs():
             try:
                 # Interface(name=intf['interface'], desc=intf['description'], device=dev).save()
                 obj,created = Interface.objects.update_or_create(
-                    defaults=dict(name=intf['interface'], desc=intf['description'], device=dev),
-                    device=dev, name=intf['interface']
+                    device=dev, name=intf['interface'],
+                    defaults=dict(name=intf['interface'], desc=intf['description'], device=dev)
                     )
                 print(obj,created)
                 #print('端口：{}保存成功'.format(intf['interface']))
