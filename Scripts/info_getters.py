@@ -2,12 +2,13 @@ from netmiko import Netmiko,ConnectHandler
 
 show_intf_cmd_maping = {
     'cisco_ios':'show interface',
+    'cisco_asa':'show interface',
 }
 
 def ssh_dev_2_get_intfs(device_type, host, username, password, secret='', port=22):
     dev_info = {
         'device_type': device_type,
-        'host': host,
+        'host': host, #用host和ip均可
         'username': username,
         'password': password,
         'port': 22,
