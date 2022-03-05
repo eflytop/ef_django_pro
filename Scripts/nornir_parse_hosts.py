@@ -1,3 +1,6 @@
+# 该脚本是将Web表弟里面的主机信息转换成nornir可识别的hosts.yaml文件
+# 通过pip install nornir-table-inventory安装对应模块
+
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','Django_Web.settings')
 
@@ -6,7 +9,6 @@ django.setup()
 
 from nornir import InitNornir
 from Net_App.models import Device
-from nornir_utils.plugins.functions import print_result
 
 def get_nornir_obj():
     devs = Device.objects.all()
