@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from .models import Device, Log, Interface
 from import_export.admin import ImportExportModelAdmin
 
@@ -21,3 +21,4 @@ class LogAdmin(admin.ModelAdmin):
 class InterfaceAdmin(admin.ModelAdmin):
     list_display = ('id', 'device', 'name', 'desc')
     list_filter = ['device']  # 右侧边快速筛选
+

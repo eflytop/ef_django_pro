@@ -6,11 +6,11 @@ from django.contrib.auth import authenticate
 import paramiko
 import time
 from django.utils import timezone as datetime
-#from datetime import datetime
 import hashlib
 from tablib import Dataset
 from django.http import HttpResponse
 from .resources import DeviceResource
+from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
 
 '''
 class DeviceUpdateView(UpdateView):
@@ -203,112 +203,49 @@ def cfg_host(request):
         return render(request, 'cfg_host.html', context)
 
     elif request.method == 'POST':
-        result = []
         selected_device_id = request.POST.getlist('device')
-        command = request.POST['command'].splitlines()
+        cmds = request.POST['command']
+        devs = []
+
         for x in selected_device_id:
-            try:
-                dev = get_object_or_404(Device, pk=x)
-                ssh_client = paramiko.SSHClient()
-                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh_client.connect(hostname=dev.ip_address, username=dev.username, password=dev.password, look_for_keys=False)
-                conn = ssh_client.invoke_shell()
-                result.append(f'{dev.ip_address} 上的运行结果：')
-                for cmd in command:
-                    conn.send(cmd + '\n')
-                    time.sleep(1)
-                    output = conn.recv(65535).decode('ascii')
-                    result.append(output)
-                log = Log(target=dev.ip_address, action='Configure', status='Success', time=datetime.now(), messages='No Error')
-                log.save()
+            dev = get_object_or_404(Device, pk=x)
+            if (dev.vendor == 'Cisco' and dev.type == 'Router') or (dev.vendor == 'Cisco' and dev.type == 'Switch'):
+                device_type = 'cisco_ios'
+            elif dev.vendor == 'Cisco' and dev.type == 'Firewall':
+                device_type = 'cisco_asa'
+            elif dev.vendor == 'Fortinet' :
+                device_type = 'fortinet'
+            devs.append(
+                {
+                    'name': dev.hostname,
+                    'ip': dev.ip_address,
+                    'username': dev.username,
+                    'password': dev.password,
+                    'port': dev.ssh_port,
+                    'platform': device_type,
+                    'secret':dev.enable_password
+                }
+            )
 
-            except Exception as e:
-                result.append(f'{dev.ip_address} 配置失败，请查看日志!')
-                log = Log(target=dev.ip_address, action='Configure', status='Error', time=datetime.now(), messages=e)
-                log.save()
-
-        result = '\n'.join(result)
-        return render(request, 'cfg_verify.html', {'result': result})
+        if 'cfgHost' in request.POST:
+            # return HttpResponse('zzzz is coming')
+            outputs = nornir_conn_cfg(devs, cmds=cmds.splitlines())
+            return render(request, 'cfg_verify.html', {'outputs': outputs})
+        elif 'showHost' in request.POST:
+            outputs = nornir_conn_show(devs, cmds=cmds.splitlines())
+            return render(request, 'cfg_verify.html', {'outputs': outputs})
+        elif 'backupHost' in request.POST:
+            if device_type == 'cisco_ios':
+                cmd = 'sh run'
+            elif device_type == 'cisco_asa':
+                cmd = 'sh run'
+            elif device_type == 'fortinet':
+                cmd = 'show full-configuration'
+            outputs = nornir_conn_backupcfg(devs, cmd)
+            return render(request, 'cfg_verify.html', {'outputs': outputs})
 
 def cfg_verify(request):
     return render(request, 'cfg_verify.html', context)
-
-def cfg_backup(request):
-    if request.method == 'GET':
-        device_list = Device.objects.all()
-        context = {'device_list': device_list}
-        return render(request, 'cfg_backup.html', context)
-
-    elif request.method == 'POST':
-        result = []
-        selected_device_id = request.POST.getlist('device')
-        for x in selected_device_id:
-            try:
-                dev = get_object_or_404(Device, pk=x)
-                ssh_client = paramiko.SSHClient()
-                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh_client.connect(hostname=dev.ip_address, username=dev.username, password=dev.password,
-                                   look_for_keys=False)
-                if dev.vendor.lower() == 'cisco':
-                    if dev.type.lower() == 'router':
-                        conn = ssh_client.invoke_shell()
-                        conn.send('terminal length 0\n')
-                        conn.send('show run\n')
-                        time.sleep(2)
-                        output = conn.recv(65535).decode('ascii')
-                        now = datetime.now()
-                        date = f'{now.month}_{now.day}_{now.year}'
-                        f = open(f'C:\\configuration_backup\\{dev.ip_address}_{date}.txt', 'w+')
-                        f.write(output)
-                        result.append(f'{dev.ip_address} 配置备份成功!')
-                    elif dev.type.lower() == 'switch':
-                        conn = ssh_client.invoke_shell()
-                        conn.send('terminal length 0\n')
-                        conn.send('show run\n')
-                        time.sleep(2)
-                        output = conn.recv(65535).decode('ascii')
-                        now = datetime.now()
-                        date = f'{now.month}_{now.day}_{now.year}'
-                        f = open(f'C:\\configuration_backup\\{dev.ip_address}_{date}.txt', 'w+')
-                        f.write(output)
-                        result.append(f'{dev.ip_address} 配置备份成功!')
-                    elif dev.type.lower() == 'firewall':
-                        conn = ssh_client.invoke_shell()
-                        conn.send('enable\n')
-                        conn.send(f'{dev.enable_password}\n')
-                        conn.send('terminal pager 0\n')
-                        conn.send('show run\n')
-                        time.sleep(10)
-                        output = conn.recv(65535).decode('ascii')
-                        now = datetime.now()
-                        date = f'{now.month}_{now.day}_{now.year}'
-                        f = open(f'C:\\configuration_backup\\{dev.ip_address}_{date}.txt', 'w+')
-                        f.write(output)
-                        result.append(f'{dev.ip_address} 配置备份成功!')
-                elif dev.vendor.lower() == 'fortinet':
-                    conn = ssh_client.invoke_shell()
-                    conn.send('terminal length 0\n')
-                    conn.send('show run\n')
-                    time.sleep(2)
-                    output = conn.recv(65535).decode('ascii')
-                    now = datetime.now()
-                    date = f'{now.month}_{now.day}_{now.year}'
-                    f = open(f'C:\\configuration_backup\\{dev.ip_address}_{date}.txt', 'w+')
-                    f.write(output)
-                    result.append(f'{dev.ip_address} 配置备份成功!')
-                log = Log(target=dev.ip_address, action='CFG Backup', status='Success', time=datetime.now(),
-                          messages='No Error')
-                log.save()
-
-            except Exception as e:
-                log = Log(target=dev.ip_address, action='CFG Backup', status='Error', time=datetime.now(),
-                          messages=e)
-                log.save()
-                result.append(f'{dev.ip_address} 配置备份失败，请查看日志!')
-
-        result = '\n'.join(result)
-        return render(request, 'cfg_verify.html', {'result': result})
-
 
 def cfg_log(request):
     logs = Log.objects.all()
