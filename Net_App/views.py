@@ -3,21 +3,19 @@ from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from .models import Device, Log
 from .forms import UserForm
 from django.contrib.auth import authenticate
-import paramiko
-import time
-from django.utils import timezone as datetime
 import hashlib
 from tablib import Dataset
 from django.http import HttpResponse
 from .resources import DeviceResource
 from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
+from Net_App.utils.nornir_inventory import nornir_ios_show_version, nornir_asa_show_version, nornir_fg_show_version
 
 '''
 class DeviceUpdateView(UpdateView):
     model = Device
     fields = ['hostname','username','password','enable_password','ssh_port','vendor','type']
     template_name = 'host_edit.html'
-    success_url = "/device_list"
+    success_url = "/host_mgmt"
 '''
 
 def hash_code(s, salt='mysite'):# 加点盐
@@ -78,11 +76,11 @@ def logout(request):
     # del request.session['user_name']
     return redirect("index")
 
-def device_list(request):
+def host_mgmt(request):
     if request.method == 'GET':
         all_device = Device.objects.all()
         context = {'all_device': all_device}
-        return render(request, 'device_list.html', context)
+        return render(request, 'host_mgmt.html', context)
 
     elif request.method == 'POST':
         device_id_list = request.POST.getlist('seleted_device_id')
@@ -90,7 +88,7 @@ def device_list(request):
         if 'delHost' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).delete()
-            return redirect('device_list')
+            return redirect('host_mgmt')
         if 'exportHost' in request.POST:
             device_resource = DeviceResource()
             dataset = device_resource.export()
@@ -107,8 +105,8 @@ def device_list(request):
             result = device_resource.import_data(dataset, dry_run=True)  # Test the data import
             if not result.has_errors():
                 device_resource.import_data(dataset, dry_run=False)  # Actually import now
-                return redirect('device_list')
-    return redirect('device_list')
+                return redirect('host_mgmt')
+    return redirect('host_mgmt')
 
 def host_add(request):
     if request.method == 'POST':
@@ -124,7 +122,7 @@ def host_add(request):
         if not host_obj:
             Device.objects.create(ip_address=ip_address, hostname=hostname,username=username, password=password, enable_password=enable_password, ssh_port=ssh_port,
                               vendor=vendor, type=type)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         return HttpResponse('该主机已存在')
     return render(request, 'host_add.html')
 
@@ -149,32 +147,32 @@ def host_update(request):
         if 'updateUsername' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(username=username)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         elif 'updatePassword' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(password=password)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         elif 'updateEnable_password' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(enable_password=enable_password)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         elif 'updateSsh_port' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(ssh_port=ssh_port)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         elif 'updateVendor' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(vendor=vendor)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         elif 'updateType' in request.POST:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(type=type)
-            return redirect('device_list')
+            return redirect('host_mgmt')
         else:
             for device_id in device_id_list:
                 Device.objects.filter(id=device_id).update(username=username, password=password, enable_password=enable_password, ssh_port=ssh_port,
                               vendor=vendor, type=type)
-            return redirect('device_list')
+            return redirect('host_mgmt')
     return render(request, 'host_update.html', locals())
 
 def host_edit(request):
@@ -191,13 +189,13 @@ def host_edit(request):
         type = request.POST.get('type')
         Device.objects.filter(id=device_id).update(ip_address=ip_address, hostname=hostname,username=username, password=password, enable_password=enable_password, ssh_port=ssh_port,
                               vendor=vendor, type=type)
-        return redirect('device_list')
+        return redirect('host_mgmt')
     return render(request, 'host_edit.html', locals())
 
 def cfg_host(request):
     if request.method == 'GET':
-        device_list = Device.objects.all()
-        context = {'device_list': device_list,
+        all_device = Device.objects.all()
+        context = {'all_device': all_device,
                    'mode': '设备配置'
                    }
         return render(request, 'cfg_host.html', context)
@@ -243,6 +241,19 @@ def cfg_host(request):
                 cmd = 'show full-configuration'
             outputs = nornir_conn_backupcfg(devs, cmd)
             return render(request, 'cfg_verify.html', {'outputs': outputs})
+        elif 'getinfoHost' in request.POST:
+            if device_type == 'cisco_ios':
+                cmd = 'sh ver'
+                outputs = nornir_ios_info(devs, cmd)
+                return HttpResponse('zzzz is coming')
+            elif device_type == 'cisco_asa':
+                cmd = 'sh ver'
+                outputs = nornir_asa_info(devs, cmd)
+                return HttpResponse('zzzz is coming')
+            elif device_type == 'fortinet':
+                cmd = 'show full-configuration'
+                outputs = nornir_fortinet_info(devs, cmd)
+                return HttpResponse('zzzz is coming')
 
 def cfg_verify(request):
     return render(request, 'cfg_verify.html', context)
@@ -251,6 +262,46 @@ def cfg_log(request):
     logs = Log.objects.all()
     context = {'logs': logs}
     return render(request, 'cfg_log.html', context)
+
+def show_version(request):
+    if request.method == 'GET':
+        all_device = Device.objects.all()
+        context = {'all_device': all_device}
+        return render(request, 'show_version.html', context)
+
+    elif request.method == 'POST':
+        selected_device_id = request.POST.getlist('device')
+        devs = []
+
+        for x in selected_device_id:
+            dev = get_object_or_404(Device, pk=x)
+            if (dev.vendor == 'Cisco' and dev.type == 'Router') or (dev.vendor == 'Cisco' and dev.type == 'Switch'):
+                device_type = 'cisco_ios'
+            elif dev.vendor == 'Cisco' and dev.type == 'Firewall':
+                device_type = 'cisco_asa'
+            elif dev.vendor == 'Fortinet' :
+                device_type = 'fortinet'
+            devs.append(
+                {
+                    'name': dev.hostname,
+                    'ip': dev.ip_address,
+                    'username': dev.username,
+                    'password': dev.password,
+                    'port': dev.ssh_port,
+                    'platform': device_type,
+                    'secret':dev.enable_password
+                }
+            )
+            if device_type == 'cisco_ios':
+                outputs = nornir_ios_show_version(devs)
+                return redirect('show_version')
+            elif device_type == 'cisco_asa':
+                outputs = nornir_asa_show_version(devs)
+                return redirect('show_version')
+            elif device_type == 'fortinet':
+                outputs = nornir_fg_show_version(devs)
+                return redirect('show_version')
+        return HttpResponse('coding')
 
 
 

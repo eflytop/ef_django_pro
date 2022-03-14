@@ -23,7 +23,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('device_list/', views.device_list, name='device_list'),
+    path('host_mgmt/', views.host_mgmt, name='host_mgmt'),
     path('cfg_host/', views.cfg_host, name='cfg_host'),
     path('cfg_verify/', views.cfg_verify, name='cfg_verify'),
     path('cfg_log/', views.cfg_log, name='cfg_log'),
@@ -32,4 +32,5 @@ urlpatterns = [
     path('host_add/', views.host_add, name='host_add'),
     path('host_edit/', views.host_edit, name='host_edit'),
     path('host_update/', views.host_update, name='host_update'),
+    path('show_version/', views.show_version, name='show_version'),
 ]

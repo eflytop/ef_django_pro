@@ -1,3 +1,8 @@
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','Django_Web.settings')
+
+import django
+django.setup()
 from nornir import InitNornir
 
 def get_nornir_obj(devs):
