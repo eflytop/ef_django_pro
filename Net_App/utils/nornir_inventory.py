@@ -91,8 +91,8 @@ if __name__ == '__main__':
     devs = [{
         'name': 'R-29.6',
         'ip': '10.245.29.6',
-        'username': 'shihua.chen',
-        'password': 'shihua.chen0310',
+        'username': 'sdddn',
+        'password': 'shddddd',
         'port': '22',
         'platform': 'cisco_ios',
         'secret': ''
@@ -100,8 +100,8 @@ if __name__ == '__main__':
         {
             'name': 'R-29.4',
             'ip': '10.245.29.4',
-            'username': 'shihua.chen',
-            'password': 'shihua.chen0310',
+            'username': 'sdddn',
+            'password': 'shihuddd310',
             'port': '22',
             'platform': 'cisco_ios',
             'secret': ''
