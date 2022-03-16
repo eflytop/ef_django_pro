@@ -13,36 +13,37 @@ def nornir_conn_cfg(devs, cmds):
     other_errors = 'Traceback'
     nr_results = []
     for i in result.keys():
+        ip = nr.inventory.hosts[i].hostname
         if timeout_errors in (result[i].result):
-            log = Log(target=i, action='Show', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Show', status='Error', time=datetime.now(),
                       messages='TCP connection to device failed..')
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'TCP connection to device failed..'
             })
         elif authen_errors in (result[i].result):
-            log = Log(target=i, action='Show', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Show', status='Error', time=datetime.now(),
                       messages='Authentication to device failed...')
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'Authentication to device failed...'
             })
         elif other_errors in (result[i].result):
-            log = Log(target=i, action='Show', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Show', status='Error', time=datetime.now(),
                       messages='Other_errors to device failed...')
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'Other_errors to device failed...'
             })
         else:
-            log = Log(target=i, action='Show', status='Success', time=datetime.now(),
+            log = Log(target=ip, action='Show', status='Success', time=datetime.now(),
                       messages=result[i].result)
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': result[i].result
             })
     return nr_results
@@ -56,36 +57,37 @@ def nornir_conn_show(devs, cmds):
     for cmd in cmds:
         result = nr.run(netmiko_send_command, command_string=cmd, enable=True)
         for i in result.keys():
+            ip = nr.inventory.hosts[i].hostname
             if timeout_errors in (result[i].result):
-                log = Log(target=i, action='Show', status='Error', time=datetime.now(),
+                log = Log(target=ip, action='Show', status='Error', time=datetime.now(),
                           messages='TCP connection to device failed..')
                 log.save()
                 nr_results.append({
-                    'ip': i,
+                    'ip': ip,
                     'output_content': f'TCP connection to device failed..'
                 })
             elif authen_errors in (result[i].result):
-                log = Log(target=i, action='Show', status='Error', time=datetime.now(),
+                log = Log(target=ip, action='Show', status='Error', time=datetime.now(),
                           messages='Authentication to device failed...')
                 log.save()
                 nr_results.append({
-                    'ip': i,
+                    'ip': ip,
                     'output_content': f'Authentication to device failed...'
                 })
             elif other_errors in (result[i].result):
-                log = Log(target=i, action='Show', status='Error', time=datetime.now(),
+                log = Log(target=ip, action='Show', status='Error', time=datetime.now(),
                           messages='Other_errors to device failed...')
                 log.save()
                 nr_results.append({
-                    'ip': i,
+                    'ip': ip,
                     'output_content': f'Other_errors to device failed...'
                 })
             else:
-                log = Log(target=i, action='Show', status='Success', time=datetime.now(),
+                log = Log(target=ip, action='Show', status='Success', time=datetime.now(),
                           messages=result[i].result)
                 log.save()
                 nr_results.append({
-                    'ip': i,
+                    'ip': ip,
                     'output_content': result[i].result
                 })
     return nr_results
@@ -106,39 +108,40 @@ def nornir_conn_backupcfg(devs,cmd):
         os.makedirs(cfg_path)
 
     for i in result.keys():
+        ip = nr.inventory.hosts[i].hostname
         if timeout_errors in (result[i].result):
-            log = Log(target=i, action='Backup', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Backup', status='Error', time=datetime.now(),
                       messages='TCP connection to device failed..')
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'TCP connection to device failed..'
             })
         elif authen_errors in (result[i].result):
-            log = Log(target=i, action='Backup', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Backup', status='Error', time=datetime.now(),
                       messages='Authentication to device failed...')
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'Authentication to device failed...'
             })
         elif other_errors in (result[i].result):
-            log = Log(target=i, action='Backup', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Backup', status='Error', time=datetime.now(),
                       messages='Other_errors to device failed...')
             log.save()
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'Other_errors to device failed...'
             })
         else:
-            log = Log(target=i, action='Backup', status='Success', time=datetime.now(),
+            log = Log(target=ip, action='Backup', status='Success', time=datetime.now(),
                       messages='备份成功！')
             log.save()
             cfg_filename = f'{cfg_path}/{i}_{file_time}.txt'
             with open(cfg_filename, "w", encoding='utf-8') as cfg_out:
                 cfg_out.write(result[i].result)
             nr_results.append({
-                'ip': i,
+                'ip': ip,
                 'output_content': f'配置备份成功！'
             })
     return nr_results

@@ -7,11 +7,6 @@ class Device(models.Model):
     password = models.CharField(max_length=255, verbose_name="密码", help_text="登录密码")
     enable_password = models.CharField(max_length=255, verbose_name="enable密码",null=True, blank=True, help_text="enable密码，选填")
     ssh_port = models.IntegerField(default=22, verbose_name="端口号", help_text="SSH登录端口号，默认为22")
-    sn = models.CharField(max_length=255, null=True, blank=True, verbose_name="序列号")
-    uptime = models.CharField(max_length=255, null=True, blank=True, verbose_name="运行时间")
-    model = models.CharField(max_length=255, null=True, blank=True, verbose_name="型号")
-    os_version = models.CharField(max_length=255, null=True, blank=True, verbose_name="软件版本")
-    image = models.CharField(max_length=255, null=True, blank=True, verbose_name="系统镜像")
 
     VENDOR_CHOICES = (
         ('Cisco', '思科'),
@@ -28,6 +23,20 @@ class Device(models.Model):
 
     def __str__(self):
         return f"{self.id}:{self.ip_address}"
+
+class Inventory(models.Model):
+    sn = models.CharField(max_length=255, null=True, blank=True, verbose_name="序列号", unique=True)
+    uptime = models.CharField(max_length=255, null=True, blank=True, verbose_name="运行时间")
+    model = models.CharField(max_length=255, null=True, blank=True, verbose_name="型号")
+    os_version = models.CharField(max_length=255, null=True, blank=True, verbose_name="软件版本")
+    image = models.CharField(max_length=255, null=True, blank=True, verbose_name="系统镜像")
+    device = models.ForeignKey('Device', verbose_name='设备', related_name='device_info', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('sn', 'device')
+
+    def __str__(self):
+        return '{}_{}'.format(self.device, self.sn)
 
 class Interface(models.Model):
     name = models.CharField(max_length=255, verbose_name="端口名")

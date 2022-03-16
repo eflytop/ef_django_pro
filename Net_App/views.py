@@ -1,6 +1,6 @@
 #from django.views.generic import UpdateView, DetailView
 from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
-from .models import Device, Log
+from .models import Device, Log, Inventory
 from .forms import UserForm
 from django.contrib.auth import authenticate
 import hashlib
@@ -8,7 +8,7 @@ from tablib import Dataset
 from django.http import HttpResponse
 from .resources import DeviceResource
 from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
-from Net_App.utils.nornir_inventory import nornir_ios_show_version, nornir_asa_show_version, nornir_fg_show_version
+from Net_App.utils.nornir_inventory import nornir_inventory
 
 '''
 class DeviceUpdateView(UpdateView):
@@ -106,6 +106,9 @@ def host_mgmt(request):
             if not result.has_errors():
                 device_resource.import_data(dataset, dry_run=False)  # Actually import now
                 return redirect('host_mgmt')
+            else:
+                return HttpResponse('导入失败')
+
     return redirect('host_mgmt')
 
 def host_add(request):
@@ -187,7 +190,7 @@ def host_edit(request):
         ssh_port = request.POST.get('ssh_port')
         vendor = request.POST.get('vendor')
         type = request.POST.get('type')
-        Device.objects.filter(id=device_id).update(ip_address=ip_address, hostname=hostname,username=username, password=password, enable_password=enable_password, ssh_port=ssh_port,
+        Device.objects.filter(id=device_id).update(ip_address=ip_address,hostname=hostname, username=username, password=password, enable_password=enable_password, ssh_port=ssh_port,
                               vendor=vendor, type=type)
         return redirect('host_mgmt')
     return render(request, 'host_edit.html', locals())
@@ -241,19 +244,15 @@ def cfg_host(request):
                 cmd = 'show full-configuration'
             outputs = nornir_conn_backupcfg(devs, cmd)
             return render(request, 'cfg_verify.html', {'outputs': outputs})
-        elif 'getinfoHost' in request.POST:
+        elif 'inventoryHost' in request.POST:
             if device_type == 'cisco_ios':
                 cmd = 'sh ver'
-                outputs = nornir_ios_info(devs, cmd)
-                return HttpResponse('zzzz is coming')
             elif device_type == 'cisco_asa':
                 cmd = 'sh ver'
-                outputs = nornir_asa_info(devs, cmd)
-                return HttpResponse('zzzz is coming')
             elif device_type == 'fortinet':
-                cmd = 'show full-configuration'
-                outputs = nornir_fortinet_info(devs, cmd)
-                return HttpResponse('zzzz is coming')
+                cmd = 'get system status'
+            outputs = nornir_inventory(devs,cmd)
+            return render(request, 'cfg_verify.html', {'outputs': outputs})
 
 def cfg_verify(request):
     return render(request, 'cfg_verify.html', context)
@@ -265,74 +264,7 @@ def cfg_log(request):
 
 def show_version(request):
     if request.method == 'GET':
-        all_device = Device.objects.all()
+        all_device = Inventory.objects.all()
         context = {'all_device': all_device}
         return render(request, 'show_version.html', context)
-
-    elif request.method == 'POST':
-        selected_device_id = request.POST.getlist('device')
-        devs = []
-
-        for x in selected_device_id:
-            dev = get_object_or_404(Device, pk=x)
-            if (dev.vendor == 'Cisco' and dev.type == 'Router') or (dev.vendor == 'Cisco' and dev.type == 'Switch'):
-                device_type = 'cisco_ios'
-            elif dev.vendor == 'Cisco' and dev.type == 'Firewall':
-                device_type = 'cisco_asa'
-            elif dev.vendor == 'Fortinet' :
-                device_type = 'fortinet'
-            devs.append(
-                {
-                    'name': dev.hostname,
-                    'ip': dev.ip_address,
-                    'username': dev.username,
-                    'password': dev.password,
-                    'port': dev.ssh_port,
-                    'platform': device_type,
-                    'secret':dev.enable_password
-                }
-            )
-            if device_type == 'cisco_ios':
-                outputs = nornir_ios_show_version(devs)
-                return redirect('show_version')
-            elif device_type == 'cisco_asa':
-                outputs = nornir_asa_show_version(devs)
-                return redirect('show_version')
-            elif device_type == 'fortinet':
-                outputs = nornir_fg_show_version(devs)
-                return redirect('show_version')
-        return HttpResponse('coding')
-
-
-
-# CBV
-'''
-class Index(View):
-    def get(self, request):
-        return render(request, 'index.html')
-    def post(self, request):
-        return HttpResponse('Welcome to CBV EFLab via POST')
-
-class Login(View):
-    def get(self, request):
-        switches = SwitchesModel.objects.all()
-        return render(request, "login.html", {'login_info':switches})
-    def post(self, request):
-        ip = request.POST['ip']
-        username = request.POST['username']
-        password = request.POST['password']
-        SwitchesModel.objects.create(ip=ip,username=username,password=password,logintime=datetime.now(tz=timezone.utc))
-        return redirect("/django_app/login")
-
-class LoginDetail(View):
-    def get(self, request, id):
-        try:
-            switch = SwitchesModel.objects.get(id=id)
-            return render(request, "logindetail.html", {'switch_detail': switch})
-        except SwitchesModel.DoesNotExist:
-            return render(request, "404.html")
-#            return HttpResponseNotFound()
-'''
-
-
 

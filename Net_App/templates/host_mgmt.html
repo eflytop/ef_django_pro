@@ -53,7 +53,7 @@
       <form method="post" enctype="multipart/form-data">
       <div class="modal-body">
             <p>导入的EXCEL表必须包含以下字段: </p>
-            <p> ip_address, hostname, username, password, enable_password, ssh_port, vendor, type</p>
+            <p> ip_address, username, password, vendor, type</p>
             {% csrf_token %}
             <input type="file"  name="imported_file">
       </div>
@@ -79,6 +79,11 @@ $(function() {
     $function importHost(){
         $('#myModal').modal('hide')
     };
+</script>
+<script type="text/javascript" class="init">
+    $(document).ready(function() {
+        $('#efdatatable').DataTable();
+    } );
 </script>
 <script type="text/javascript">
          function selects(){
