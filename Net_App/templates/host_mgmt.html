@@ -27,7 +27,7 @@
                 <td>{{ device.ssh_port }}</td>
                 <td>{{ device.vendor }}</td>
                 <td>{{ device.type }}</td>
-                <td><a href="/host_edit/?device_id={{ device.id }}" class="btn btn-outline-secondary btn-sm">修改</a>
+                <td> <a href="/host_edit/?device_id={{ device.id }}" class="btn btn-outline-secondary btn-sm">修改</a>
                 </td>
             </tr>
             {% endfor %}
@@ -44,23 +44,23 @@
 </form>
 <!-- Modal ImportHost Start-->
 <div class="modal fade" id="importHost" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">导入主机</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <form method="post" enctype="multipart/form-data">
-      <div class="modal-body">
-            <p>导入的EXCEL表必须包含以下字段: </p>
-            <p> ip_address, username, password, vendor, type</p>
-            {% csrf_token %}
-            <input type="file"  name="imported_file">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">取消</button>
-        <button type="submit" class="btn btn-outline-secondary btn-sm" name="importHost">导入</button>
-      </div>
+          <div class="modal-body">
+                <p>导入的EXCEL表必须包含以下字段: </p>
+                <p> ip_address, username, password, vendor, type</p>
+                {% csrf_token %}
+                <input type="file"  name="imported_file">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-outline-secondary btn-sm" name="importHost">导入</button>
+          </div>
       </form>
     </div>
   </div>
@@ -68,12 +68,12 @@
 <!-- Modal ImportHost End-->
 </br>
 <script>
-$(function() {
-    $('#myModal').on('hide.bs.modal',
-    function() {
-        alert('嘿，我听说您喜欢模态框...');
-    })
-});
+    $(function() {
+        $('#myModal').on('hide.bs.modal',
+        function() {
+            alert('嘿，我听说您喜欢模态框...');
+        })
+    });
 </script>
 <script type="text/javascript">
     $function importHost(){

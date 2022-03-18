@@ -1,4 +1,3 @@
-#from django.views.generic import UpdateView, DetailView
 from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from .models import Device, Log, Inventory
 from .forms import UserForm
@@ -9,14 +8,7 @@ from django.http import HttpResponse
 from .resources import DeviceResource
 from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
 from Net_App.utils.nornir_inventory import nornir_inventory
-
-'''
-class DeviceUpdateView(UpdateView):
-    model = Device
-    fields = ['hostname','username','password','enable_password','ssh_port','vendor','type']
-    template_name = 'host_edit.html'
-    success_url = "/host_mgmt"
-'''
+import time
 
 def hash_code(s, salt='mysite'):# 加点盐
     h = hashlib.sha256()
@@ -107,8 +99,7 @@ def host_mgmt(request):
                 device_resource.import_data(dataset, dry_run=False)  # Actually import now
                 return redirect('host_mgmt')
             else:
-                return HttpResponse('导入失败')
-
+                return HttpResponse('导入失败，暂时没有进行报错处理，大概率是导入了已经存在的主机')
     return redirect('host_mgmt')
 
 def host_add(request):
@@ -130,8 +121,6 @@ def host_add(request):
     return render(request, 'host_add.html')
 
 def host_update(request):
-    # if request.method == 'GET':
-    #     return HttpResponse('GET is coming')
     device_id_list = request.session['seleted_device_id']
     selected_ip_list = []
     username = request.POST.get('username')
@@ -267,4 +256,3 @@ def show_version(request):
         all_device = Inventory.objects.all()
         context = {'all_device': all_device}
         return render(request, 'show_version.html', context)
-
