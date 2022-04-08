@@ -5,10 +5,9 @@ from django.contrib.auth import authenticate
 import hashlib
 from tablib import Dataset
 from django.http import HttpResponse
-from .resources import DeviceResource
+from .resources import DeviceResource, InventoryResource
 from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
 from Net_App.utils.nornir_inventory import nornir_inventory
-import time
 
 def hash_code(s, salt='mysite'):# 加点盐
     h = hashlib.sha256()
@@ -18,11 +17,11 @@ def hash_code(s, salt='mysite'):# 加点盐
 
 def index(request):
     all_device = Device.objects.all()
-    cisco_device = Device.objects.filter(vendor="cisco")
-    forti_device = Device.objects.filter(vendor='fortinet')
-    all_router = Device.objects.filter(type='router')
-    all_switch = Device.objects.filter(type='switch')
-    all_firewall = Device.objects.filter(type='firewall')
+    cisco_device = Device.objects.filter(vendor="Cisco")
+    forti_device = Device.objects.filter(vendor='Fortinet')
+    all_router = Device.objects.filter(type='Router')
+    all_switch = Device.objects.filter(type='Switch')
+    all_firewall = Device.objects.filter(type='Firewall')
     last_10_event = Log.objects.all().order_by('-id')[:10]
     context = {'all_device': len(all_device),
                'cisco_device': len(cisco_device),
@@ -99,7 +98,7 @@ def host_mgmt(request):
                 device_resource.import_data(dataset, dry_run=False)  # Actually import now
                 return redirect('host_mgmt')
             else:
-                return HttpResponse('导入失败，暂时没有进行报错处理，大概率是导入了已经存在的主机')
+                return HttpResponse(f'导入失败，暂时没有进行报错处理，大概率是导入了已经存在的主机:{result.totals}')
     return redirect('host_mgmt')
 
 def host_add(request):
@@ -256,3 +255,9 @@ def show_version(request):
         all_device = Inventory.objects.all()
         context = {'all_device': all_device}
         return render(request, 'show_version.html', context)
+    elif request.method == 'POST':
+        info_resource = InventoryResource()
+        dataset = info_resource.export()
+        response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="exported_host_info.xls"'
+        return response

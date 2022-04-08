@@ -26,7 +26,7 @@ class LogAdmin(admin.ModelAdmin):
 
 @admin.register(Inventory)
 
-class Inventory(ImportExportModelAdmin):
+class InventoryAdmin(ImportExportModelAdmin):
     list_display = ('id', 'device', 'sn', 'model')
     list_filter = ['device']  # 右侧边快速筛选
 

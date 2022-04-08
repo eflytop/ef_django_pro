@@ -32,6 +32,7 @@
                 {% endfor %}
             </tbody>
         </table>
+    <input type="submit" class="btn btn-outline-secondary btn-sm" onclick="comfirmExport()" value="导出"/>
 </form>
 <script type="text/javascript" class="init">
     $(document).ready(function() {
@@ -40,7 +41,13 @@
         });
     } );
 </script>
-
+<script type="text/javascript">
+        function comfirmExport(){
+            if(!confirm("确认要导出吗？")){
+            window.event.returnValue = false;
+            }
+        }
+</script>
 {% else %}
 <h6 class="mt-4">你尚未登录，只能访问公开内容！</h6>
 {% endif %}

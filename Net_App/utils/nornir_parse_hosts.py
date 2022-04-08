@@ -18,13 +18,13 @@ def get_nornir_obj(devs):
                 'username': dev['username'],
                 'password': dev['password'],
                 'netmiko_secret': dev['secret'],
-                'netmiko_conn_timeout': 20
+                'netmiko_conn_timeout': 100
             }
         )
     runner = {
         "plugin": "threaded",
         "options": {
-            "num_workers": 100,
+            "num_workers": 5,
         },
     }
     inventory = {

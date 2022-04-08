@@ -54,6 +54,7 @@
           <div class="modal-body">
                 <p>导入的EXCEL表必须包含以下字段: </p>
                 <p> ip_address, username, password, vendor, type</p>
+                <p> 其中ip_address为唯一值，不能重复导入</p>
                 {% csrf_token %}
                 <input type="file"  name="imported_file">
           </div>
