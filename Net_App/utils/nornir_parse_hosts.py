@@ -1,8 +1,3 @@
-import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','Django_Web.settings')
-
-import django
-django.setup()
 from nornir import InitNornir
 
 def get_nornir_obj(devs):
@@ -18,7 +13,7 @@ def get_nornir_obj(devs):
                 'username': dev['username'],
                 'password': dev['password'],
                 'netmiko_secret': dev['secret'],
-                'netmiko_conn_timeout': 100
+                'netmiko_conn_timeout': 1000
             }
         )
     runner = {
