@@ -19,7 +19,7 @@ def get_nornir_obj(devs):
     runner = {
         "plugin": "threaded",
         "options": {
-            "num_workers": 10,
+            "num_workers": 100,
         },
     }
     inventory = {

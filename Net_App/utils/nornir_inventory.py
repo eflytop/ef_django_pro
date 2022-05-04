@@ -5,7 +5,7 @@ from django.utils import timezone as datetime
 
 def nornir_inventory(devs,cmd):
     nr = get_nornir_obj(devs)
-    result = nr.run(netmiko_send_command, command_string=cmd, use_textfsm=True)
+    result = nr.run(netmiko_send_command, command_string=cmd,enable=True, use_textfsm=True)
     timeout_errors = 'netmiko.ssh_exception.NetmikoTimeoutException'
     authen_errors = 'netmiko.ssh_exception.NetmikoAuthenticationException'
     other_errors = 'Traceback'
