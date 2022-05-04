@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 import hashlib
 from tablib import Dataset
 from django.http import HttpResponse
-from .resources import DeviceResource
+from .resources import DeviceResource, InventoryResource
 from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
 from Net_App.utils.nornir_inventory import nornir_inventory
 
@@ -255,3 +255,9 @@ def show_version(request):
         all_device = Inventory.objects.all()
         context = {'all_device': all_device}
         return render(request, 'show_version.html', context)
+    elif request.method == 'POST':
+        info_resource = InventoryResource()
+        dataset = info_resource.export()
+        response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="exported_host_info.xls"'
+        return response

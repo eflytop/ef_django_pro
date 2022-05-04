@@ -1,9 +1,3 @@
-import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','Django_Web.settings')
-
-import django
-django.setup()
-
 from nornir_netmiko import netmiko_send_command
 from Net_App.models import Device, Log, Inventory
 from Net_App.utils.nornir_parse_hosts import get_nornir_obj
