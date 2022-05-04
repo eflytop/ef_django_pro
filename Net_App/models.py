@@ -1,8 +1,8 @@
 from django.db import models
 
 class Device(models.Model):
-    ip_address = models.CharField(max_length=255, verbose_name="设备IP", help_text="设备IP地址", unique=True)
-    hostname = models.CharField(max_length=255, verbose_name="主机名", null=True, blank=True, help_text="设备主机名，选填")
+    ip_address = models.GenericIPAddressField(verbose_name="设备IP", help_text="设备IP地址", unique=True)
+    hostname = models.CharField(max_length=255, verbose_name="主机名", default='unknown',  help_text="设备主机名，选填")
     username = models.CharField(max_length=255, verbose_name="用户名", help_text="登录用户名")
     password = models.CharField(max_length=255, verbose_name="密码", help_text="登录密码")
     enable_password = models.CharField(max_length=255, verbose_name="enable密码",null=True, blank=True, help_text="enable密码，选填")

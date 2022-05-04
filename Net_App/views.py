@@ -8,7 +8,6 @@ from django.http import HttpResponse
 from .resources import DeviceResource
 from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
 from Net_App.utils.nornir_inventory import nornir_inventory
-import time
 
 def hash_code(s, salt='mysite'):# 加点盐
     h = hashlib.sha256()
@@ -18,11 +17,11 @@ def hash_code(s, salt='mysite'):# 加点盐
 
 def index(request):
     all_device = Device.objects.all()
-    cisco_device = Device.objects.filter(vendor="cisco")
-    forti_device = Device.objects.filter(vendor='fortinet')
-    all_router = Device.objects.filter(type='router')
-    all_switch = Device.objects.filter(type='switch')
-    all_firewall = Device.objects.filter(type='firewall')
+    cisco_device = Device.objects.filter(vendor="Cisco")
+    forti_device = Device.objects.filter(vendor='Fortinet')
+    all_router = Device.objects.filter(type='Router')
+    all_switch = Device.objects.filter(type='Switch')
+    all_firewall = Device.objects.filter(type='Firewall')
     last_10_event = Log.objects.all().order_by('-id')[:10]
     context = {'all_device': len(all_device),
                'cisco_device': len(cisco_device),
@@ -99,7 +98,7 @@ def host_mgmt(request):
                 device_resource.import_data(dataset, dry_run=False)  # Actually import now
                 return redirect('host_mgmt')
             else:
-                return HttpResponse('导入失败，暂时没有进行报错处理，大概率是导入了已经存在的主机')
+                return HttpResponse(f'导入失败，暂时没有进行报错处理，大概率是导入了已经存在的主机:{result.totals}')
     return redirect('host_mgmt')
 
 def host_add(request):
@@ -220,10 +219,10 @@ def cfg_host(request):
         if 'cfgHost' in request.POST:
             # return HttpResponse('zzzz is coming')
             outputs = nornir_conn_cfg(devs, cmds=cmds.splitlines())
-            return render(request, 'cfg_verify.html', {'outputs': outputs})
+#            return render(request, 'cfg_verify.html', {'outputs': outputs})
         elif 'showHost' in request.POST:
             outputs = nornir_conn_show(devs, cmds=cmds.splitlines())
-            return render(request, 'cfg_verify.html', {'outputs': outputs})
+#            return render(request, 'cfg_verify.html', {'outputs': outputs})
         elif 'backupHost' in request.POST:
             if device_type == 'cisco_ios':
                 cmd = 'sh run'
@@ -232,7 +231,7 @@ def cfg_host(request):
             elif device_type == 'fortinet':
                 cmd = 'show full-configuration'
             outputs = nornir_conn_backupcfg(devs, cmd)
-            return render(request, 'cfg_verify.html', {'outputs': outputs})
+#            return render(request, 'cfg_verify.html', {'outputs': outputs})
         elif 'inventoryHost' in request.POST:
             if device_type == 'cisco_ios':
                 cmd = 'sh ver'
@@ -241,7 +240,7 @@ def cfg_host(request):
             elif device_type == 'fortinet':
                 cmd = 'get system status'
             outputs = nornir_inventory(devs,cmd)
-            return render(request, 'cfg_verify.html', {'outputs': outputs})
+    return render(request, 'cfg_verify.html', {'outputs': outputs})
 
 def cfg_verify(request):
     return render(request, 'cfg_verify.html', context)

@@ -1,8 +1,3 @@
-import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','Django_Web.settings')
-
-import django
-django.setup()
 from nornir import InitNornir
 
 def get_nornir_obj(devs):
@@ -11,20 +6,20 @@ def get_nornir_obj(devs):
     for dev in devs:
         devs_data.append(
             {
-                'name': dev['name'],
+                'name': dev['ip'],
                 'hostname': dev['ip'],
                 'platform': dev['platform'],
                 'port': dev['port'],
                 'username': dev['username'],
                 'password': dev['password'],
                 'netmiko_secret': dev['secret'],
-                'netmiko_conn_timeout': 20
+                'netmiko_conn_timeout': 100,
             }
         )
     runner = {
         "plugin": "threaded",
         "options": {
-            "num_workers": 100,
+            "num_workers": 10,
         },
     }
     inventory = {

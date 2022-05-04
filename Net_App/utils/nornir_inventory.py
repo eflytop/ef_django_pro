@@ -73,9 +73,7 @@ def nornir_inventory(devs,cmd):
             elif device_type == 'fortinet':
                 Inventory.objects.update_or_create(device=dev,
                                                    defaults=dict(sn=result[i].result[0]['serial_number'],
-                                                           model=result[i].result[0]['version'],
-                                                           image=result[i].result[0]['version'],
-                                                           os_version=result[i].result[0]['version']))
+                                                           model=result[i].result[0]['version'],))
                 Device.objects.filter(ip_address=ip).update(hostname=result[i].result[0]['hostname'],)
                 # print(device_type)
                 # print(i)
