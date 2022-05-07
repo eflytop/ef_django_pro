@@ -5,6 +5,49 @@ from Net_App.utils.nornir_parse_hosts import get_nornir_obj
 import os
 import time
 
+def nornir_conn_savecfg(devs):
+    nr = get_nornir_obj(devs)
+    result = nr.run(netmiko_save_config)
+    timeout_errors = 'netmiko.ssh_exception.NetmikoTimeoutException'
+    authen_errors = 'netmiko.ssh_exception.NetmikoAuthenticationException'
+    other_errors = 'Traceback'
+    nr_results = []
+    for i in result.keys():
+        ip = nr.inventory.hosts[i].hostname
+        if timeout_errors in (result[i].result):
+            log = Log(target=ip, action='Config', status='Error', time=datetime.now(),
+                      messages='TCP connection to device failed..')
+            log.save()
+            nr_results.append({
+                'ip': ip,
+                'output_content': f'TCP connection to device failed..'
+            })
+        elif authen_errors in (result[i].result):
+            log = Log(target=ip, action='Config', status='Error', time=datetime.now(),
+                      messages='Authentication to device failed...')
+            log.save()
+            nr_results.append({
+                'ip': ip,
+                'output_content': f'Authentication to device failed...'
+            })
+        elif other_errors in (result[i].result):
+            log = Log(target=ip, action='Config', status='Error', time=datetime.now(),
+                      messages='Other_errors to device failed...')
+            log.save()
+            nr_results.append({
+                'ip': ip,
+                'output_content': f'Other_errors to device failed...'
+            })
+        else:
+            log = Log(target=ip, action='Config', status='Success', time=datetime.now(),
+                      messages=result[i].result)
+            log.save()
+            nr_results.append({
+                'ip': ip,
+                'output_content': f'running configuration is saved'
+            })
+    return nr_results
+
 def nornir_conn_cfg(devs, cmds):
     nr = get_nornir_obj(devs)
     result = nr.run(netmiko_send_config, config_commands=cmds, enable=True)

@@ -6,7 +6,7 @@ import hashlib
 from tablib import Dataset
 from django.http import HttpResponse
 from .resources import DeviceResource, InventoryResource
-from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg
+from Net_App.utils.nornir_conn import nornir_conn_cfg, nornir_conn_show, nornir_conn_backupcfg, nornir_conn_savecfg
 from Net_App.utils.nornir_inventory import nornir_inventory
 
 def hash_code(s, salt='mysite'):# 加点盐
@@ -220,6 +220,8 @@ def cfg_host(request):
             # return HttpResponse('zzzz is coming')
             outputs = nornir_conn_cfg(devs, cmds=cmds.splitlines())
 #            return render(request, 'cfg_verify.html', {'outputs': outputs})
+        elif 'saveHost' in request.POST:
+            outputs = nornir_conn_savecfg(devs)
         elif 'showHost' in request.POST:
             outputs = nornir_conn_show(devs, cmds=cmds.splitlines())
 #            return render(request, 'cfg_verify.html', {'outputs': outputs})
