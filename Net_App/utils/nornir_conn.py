@@ -15,7 +15,7 @@ def nornir_conn_savecfg(devs):
     for i in result.keys():
         ip = nr.inventory.hosts[i].hostname
         if timeout_errors in (result[i].result):
-            log = Log(target=ip, action='Config', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Savecfg', status='Error', time=datetime.now(),
                       messages='TCP connection to device failed..')
             log.save()
             nr_results.append({
@@ -23,7 +23,7 @@ def nornir_conn_savecfg(devs):
                 'output_content': f'TCP connection to device failed..'
             })
         elif authen_errors in (result[i].result):
-            log = Log(target=ip, action='Config', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Savecfg', status='Error', time=datetime.now(),
                       messages='Authentication to device failed...')
             log.save()
             nr_results.append({
@@ -31,7 +31,7 @@ def nornir_conn_savecfg(devs):
                 'output_content': f'Authentication to device failed...'
             })
         elif other_errors in (result[i].result):
-            log = Log(target=ip, action='Config', status='Error', time=datetime.now(),
+            log = Log(target=ip, action='Savecfg', status='Error', time=datetime.now(),
                       messages='Other_errors to device failed...')
             log.save()
             nr_results.append({
@@ -39,7 +39,7 @@ def nornir_conn_savecfg(devs):
                 'output_content': f'Other_errors to device failed...'
             })
         else:
-            log = Log(target=ip, action='Config', status='Success', time=datetime.now(),
+            log = Log(target=ip, action='Savecfg', status='Success', time=datetime.now(),
                       messages=result[i].result)
             log.save()
             nr_results.append({
