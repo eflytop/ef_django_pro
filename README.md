@@ -7,4 +7,5 @@ paramiko
 netmiko  
 nornir  
 nornir-table-inventory  
-nornir-netmiko   
+nornir-netmiko
+django-ip-restriction 
